@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/animals"
+        android:title= "Động vật"/>
+    <item android:id="@+id/views"
+        android:title= "Phong cảnh" />
+    <item android:id="@+id/girls"
+        android:title= "Gái xinh" />
+    <item android:id="@+id/cars"
+        android:title= "Ô tô" />
+</menu>
