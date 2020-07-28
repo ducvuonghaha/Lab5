@@ -55,7 +55,11 @@ public class GalleriesPhotoActivity extends AppCompatActivity {
             public void onRefresh() {
                 GalleriesPhotoActivity.this.page = 1;
                 photoList.clear();
-                loadPhoto(GalleriesPhotoActivity.this.page);
+                try {
+                    loadPhoto(GalleriesPhotoActivity.this.page);
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -63,12 +67,17 @@ public class GalleriesPhotoActivity extends AppCompatActivity {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 GalleriesPhotoActivity.this.page++;
-                loadPhoto(GalleriesPhotoActivity.this.page++);
+                try {
+                    loadPhoto(GalleriesPhotoActivity.this.page++);
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
     public void loadPhoto(int page) {
+
         Intent intent = getIntent();
         String id = intent.getStringExtra("gallery");
         Log.e("A", id);
@@ -77,7 +86,7 @@ public class GalleriesPhotoActivity extends AppCompatActivity {
                     .addBodyParameter("api_key", "38d6aedcff4a62c85699b67c1b352a18")
                     .addBodyParameter("gallery_id", id)
                     .addBodyParameter("continuation", "0")
-                    .addBodyParameter("per_page", "10")
+                    .addBodyParameter("per_page", "30")
                     .addBodyParameter("extras", "views,media,path_alias,date_taken,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o")
                     .addBodyParameter("page", String.valueOf(page))
                     .addBodyParameter("format", "json")
@@ -106,9 +115,8 @@ public class GalleriesPhotoActivity extends AppCompatActivity {
 
                         }
                     });
-
-
-        }
-
     }
+
+
+}
 

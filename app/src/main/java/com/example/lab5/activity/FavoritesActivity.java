@@ -63,7 +63,12 @@ public class FavoritesActivity extends AppCompatActivity {
             public void onRefresh() {
                 FavoritesActivity.this.page = 1;
                 photoList.clear();
-                loadPhotos(FavoritesActivity.this.page);
+                try {
+                    loadPhotos(FavoritesActivity.this.page);
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
@@ -71,7 +76,11 @@ public class FavoritesActivity extends AppCompatActivity {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 FavoritesActivity.this.page++;
-                loadPhotos(FavoritesActivity.this.page++);
+                try {
+                    loadPhotos(FavoritesActivity.this.page);
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
