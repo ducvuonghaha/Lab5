@@ -41,20 +41,17 @@ public class FavoritesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
-        try {
-            rvPhotos = (RecyclerView) findViewById(R.id.rvPhotos);
-            photoList = new ArrayList<>();
-            photoAdapter = new PhotoAdapter(this, photoList);
-            staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-            rvPhotos.setAdapter(photoAdapter);
-            rvPhotos.setLayoutManager(staggeredGridLayoutManager);
-            rvPhotos.setItemAnimator(null);
-            staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-            rvPhotos.getRecycledViewPool().clear();
-            photoList.clear();
-        } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
-        }
+        rvPhotos = (RecyclerView) findViewById(R.id.rvPhotos);
+        photoList = new ArrayList<>();
+        photoAdapter = new PhotoAdapter(this, photoList);
+        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        rvPhotos.setAdapter(photoAdapter);
+        rvPhotos.setLayoutManager(staggeredGridLayoutManager);
+        rvPhotos.setItemAnimator(null);
+        staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        rvPhotos.getRecycledViewPool().clear();
+        photoList.clear();
+
 
         loadPhotos(page);
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout);
@@ -63,11 +60,8 @@ public class FavoritesActivity extends AppCompatActivity {
             public void onRefresh() {
                 FavoritesActivity.this.page = 1;
                 photoList.clear();
-                try {
-                    loadPhotos(FavoritesActivity.this.page);
-                } catch (IndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                }
+
+                loadPhotos(FavoritesActivity.this.page);
 
             }
         });
@@ -76,51 +70,51 @@ public class FavoritesActivity extends AppCompatActivity {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 FavoritesActivity.this.page++;
-                try {
-                    loadPhotos(FavoritesActivity.this.page);
-                } catch (IndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                }
+
+                loadPhotos(FavoritesActivity.this.page);
+
             }
         });
     }
 
     public void loadPhotos(int page) {
-            try {
-            AndroidNetworking.post("https://www.flickr.com/services/rest/")
-                    .addBodyParameter("method", "flickr.favorites.getList")
-                    .addBodyParameter("api_key", "38d6aedcff4a62c85699b67c1b352a18")
-                    .addBodyParameter("user_id", "187032707@N07")
-                    .addBodyParameter("format", "json")
-                    .addBodyParameter("nojsoncallback", "1")
-                    .addBodyParameter("extras", "views,media,path_alias,date_taken,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o")
-                    .addBodyParameter("per_page", "30")
-                    .addBodyParameter("page", String.valueOf(page))
-                    .setTag("test")
-                    .setPriority(Priority.MEDIUM)
-                    .build()
-                    .getAsObject(Example.class, new ParsedRequestListener() {
-                        @Override
-                        public void onResponse(Object response) {
 
-                            swipeLayout.setRefreshing(false);
-                            Example example = (Example) response;
-                            List<Photo> photos = example.getPhotos().getPhoto();
+        AndroidNetworking.post("https://www.flickr.com/services/rest/")
+                .addBodyParameter("method", "flickr.favorites.getList")
+                .addBodyParameter("api_key", "38d6aedcff4a62c85699b67c1b352a18")
+                .addBodyParameter("user_id", "187032707@N07")
+                .addBodyParameter("format", "json")
+                .addBodyParameter("nojsoncallback", "1")
+                .addBodyParameter("extras", "views,media,path_alias,date_taken,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o")
+                .addBodyParameter("per_page", "30")
+                .addBodyParameter("page", String.valueOf(page))
+                .setTag("test")
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsObject(Example.class, new ParsedRequestListener() {
+                    @Override
+                    public void onResponse(Object response) {
 
+                        swipeLayout.setRefreshing(false);
+                        Example example = (Example) response;
+                        List<Photo> photos = example.getPhotos().getPhoto();
+                        try {
                             photoList.addAll(photos);
                             photoAdapter.notifyDataSetChanged();
                             photoAdapter.notifyItemRangeRemoved(0, photoList.size());
-
+                        } catch (IndexOutOfBoundsException e) {
+                            e.printStackTrace();
                         }
 
-                        @Override
-                        public void onError(ANError anError) {
 
-                        }
-                    });
-            } catch (IndexOutOfBoundsException e) {
-                e.printStackTrace();
-            }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+
+                    }
+                });
+
 
     }
 

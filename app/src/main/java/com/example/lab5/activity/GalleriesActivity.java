@@ -39,7 +39,7 @@ public class GalleriesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_galleries);
-        try {
+
             rvPhotos2 = (RecyclerView) findViewById(R.id.rvPhotos2);
             galleryList = new ArrayList<>();
             galleryAdapter = new GalleryAdapter(this, galleryList);
@@ -49,9 +49,7 @@ public class GalleriesActivity extends AppCompatActivity {
             rvPhotos2.setItemAnimator(null);
             rvPhotos2.getRecycledViewPool().clear();
             galleryList.clear();
-        } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
-        }
+
 
         loadGalleries(page);
         swipeLayout2 = (SwipeRefreshLayout) findViewById(R.id.swipeLayout2);
@@ -75,7 +73,7 @@ public class GalleriesActivity extends AppCompatActivity {
 
 
     public void loadGalleries(int page) {
-        try {
+
             AndroidNetworking.post("https://www.flickr.com/services/rest/")
                     .addBodyParameter("method", "flickr.galleries.getList")
                     .addBodyParameter("api_key", "38d6aedcff4a62c85699b67c1b352a18")
@@ -95,9 +93,14 @@ public class GalleriesActivity extends AppCompatActivity {
                             swipeLayout2.setRefreshing(false);
                             ExampleGalleries example = (ExampleGalleries) response;
                             List<Gallery> galleries = example.getGalleries().getGallery();
-                            galleryList.addAll(galleries);
-                            galleryAdapter.notifyDataSetChanged();
-                            galleryAdapter.notifyItemRangeRemoved(0, galleryList.size());
+                            try {
+                                galleryList.addAll(galleries);
+                                galleryAdapter.notifyDataSetChanged();
+                                galleryAdapter.notifyItemRangeRemoved(0, galleryList.size());
+                            } catch (IndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
+
                         }
 
                         @Override
@@ -105,9 +108,7 @@ public class GalleriesActivity extends AppCompatActivity {
 
                         }
                     });
-        } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
-        }
+
 
     }
 }
