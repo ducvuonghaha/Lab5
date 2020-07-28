@@ -4,20 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.common.Priority;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.example.lab5.R;
-import com.example.lab5.json_galleries.ExampleGalleries;
-import com.example.lab5.json_galleries.Gallery;
-
-import java.util.List;
+import com.example.lab5.json_galleries.Galleries;
 
 public class MainActivity extends AppCompatActivity {
 

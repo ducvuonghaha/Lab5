@@ -8,9 +8,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -18,33 +15,28 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.example.lab5.EndlessRecyclerViewScrollListener;
 import com.example.lab5.R;
-import com.example.lab5.adapter.PhotoAdapter;
-import com.example.lab5.json_favorites.Example;
-import com.example.lab5.json_favorites.Photo;
-import com.example.lab5.json_galleries.ExampleGalleries;
-import com.example.lab5.json_galleries.Gallery;
+import com.example.lab5.adapter.PhotoGalleryAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FavoritesActivity extends AppCompatActivity {
+public class GalleriesPhotoActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeLayout;
     private RecyclerView rvPhotos;
     private int page = 1;
-    private PhotoAdapter photoAdapter;
-    private ArrayList<com.example.lab5.json_favorites.Photo> photoList;
     private StaggeredGridLayoutManager staggeredGridLayoutManager;
-
+    private PhotoGalleryAdapter photoAdapter;
+    private ArrayList<com.example.lab5.json_gallery_photo.Photo> photoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_favorites);
+        setContentView(R.layout.activity_galleries_photo);
         try {
-            rvPhotos = (RecyclerView) findViewById(R.id.rvPhotos);
+            rvPhotos = (RecyclerView) findViewById(R.id.rvPhotos1);
             photoList = new ArrayList<>();
-            photoAdapter = new PhotoAdapter(this, photoList);
+            photoAdapter = new PhotoGalleryAdapter(this, photoList);
             staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
             rvPhotos.setAdapter(photoAdapter);
             rvPhotos.setLayoutManager(staggeredGridLayoutManager);
@@ -56,51 +48,56 @@ public class FavoritesActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        loadPhotos(page);
-        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout);
+        loadPhoto(page);
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout1);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                FavoritesActivity.this.page = 1;
+                GalleriesPhotoActivity.this.page = 1;
                 photoList.clear();
-                loadPhotos(FavoritesActivity.this.page);
+                loadPhoto(GalleriesPhotoActivity.this.page);
             }
         });
 
         rvPhotos.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                FavoritesActivity.this.page++;
-                loadPhotos(FavoritesActivity.this.page++);
+                GalleriesPhotoActivity.this.page++;
+                loadPhoto(GalleriesPhotoActivity.this.page++);
             }
         });
     }
 
-    public void loadPhotos(int page) {
-            try {
+    public void loadPhoto(int page) {
+        Intent intent = getIntent();
+        String id = intent.getStringExtra("gallery");
+        Log.e("A", id);
             AndroidNetworking.post("https://www.flickr.com/services/rest/")
-                    .addBodyParameter("method", "flickr.favorites.getList")
+                    .addBodyParameter("method", "flickr.galleries.getPhotos")
                     .addBodyParameter("api_key", "38d6aedcff4a62c85699b67c1b352a18")
-                    .addBodyParameter("user_id", "187032707@N07")
+                    .addBodyParameter("gallery_id", id)
+                    .addBodyParameter("continuation", "0")
+                    .addBodyParameter("per_page", "10")
+                    .addBodyParameter("extras", "views,media,path_alias,date_taken,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o")
+                    .addBodyParameter("page", String.valueOf(page))
                     .addBodyParameter("format", "json")
                     .addBodyParameter("nojsoncallback", "1")
-                    .addBodyParameter("extras", "views,media,path_alias,date_taken,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o")
-                    .addBodyParameter("per_page", "30")
-                    .addBodyParameter("page", String.valueOf(page))
                     .setTag("test")
                     .setPriority(Priority.MEDIUM)
                     .build()
-                    .getAsObject(Example.class, new ParsedRequestListener() {
+                    .getAsObject(com.example.lab5.json_gallery_photo.Example.class, new ParsedRequestListener() {
                         @Override
                         public void onResponse(Object response) {
-
                             swipeLayout.setRefreshing(false);
-                            Example example = (Example) response;
-                            List<Photo> photos = example.getPhotos().getPhoto();
-
-                            photoList.addAll(photos);
-                            photoAdapter.notifyDataSetChanged();
-                            photoAdapter.notifyItemRangeRemoved(0, photoList.size());
+                            com.example.lab5.json_gallery_photo.Example example = (com.example.lab5.json_gallery_photo.Example) response;
+                            List<com.example.lab5.json_gallery_photo.Photo> photos = example.getPhotos().getPhoto();
+                            try {
+                                photoList.addAll(photos);
+                                photoAdapter.notifyDataSetChanged();
+                                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
+                            } catch (IndexOutOfBoundsException e) {
+                                e.printStackTrace();
+                            }
 
                         }
 
@@ -109,11 +106,9 @@ public class FavoritesActivity extends AppCompatActivity {
 
                         }
                     });
-            } catch (IndexOutOfBoundsException e) {
-                e.printStackTrace();
-            }
+
+
+        }
 
     }
 
-
-}

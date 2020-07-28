@@ -1,11 +1,11 @@
 package com.example.lab5.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,11 +15,12 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.example.lab5.EndlessRecyclerViewScrollListener;
 import com.example.lab5.R;
+import com.example.lab5.adapter.GalleryAdapter;
 import com.example.lab5.adapter.PhotoAdapter;
-import com.example.lab5.adapter.PhotoGalleryAdapter;
 import com.example.lab5.json_favorites.Example;
 import com.example.lab5.json_favorites.Photo;
 import com.example.lab5.json_galleries.ExampleGalleries;
+import com.example.lab5.json_galleries.Galleries;
 import com.example.lab5.json_galleries.Gallery;
 
 import java.util.ArrayList;
@@ -27,84 +28,76 @@ import java.util.List;
 
 public class GalleriesActivity extends AppCompatActivity {
 
-    private SwipeRefreshLayout swipeLayout;
-    private RecyclerView rvPhotos;
+    private SwipeRefreshLayout swipeLayout2;
+    private RecyclerView rvPhotos2;
     private int page = 1;
-    private StaggeredGridLayoutManager staggeredGridLayoutManager;
-    private PhotoGalleryAdapter photoAdapter;
-    private ArrayList<com.example.lab5.json_gallery_photo.Photo> photoList;
+    private GalleryAdapter galleryAdapter;
+    private ArrayList<Gallery> galleryList;
+    private LinearLayoutManager linearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_galleries);
         try {
-            rvPhotos = (RecyclerView) findViewById(R.id.rvPhotos1);
-            photoList = new ArrayList<>();
-            photoAdapter = new PhotoGalleryAdapter(this, photoList);
-            staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-            rvPhotos.setAdapter(photoAdapter);
-            rvPhotos.setLayoutManager(staggeredGridLayoutManager);
-            rvPhotos.setItemAnimator(null);
-            staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-            rvPhotos.getRecycledViewPool().clear();
-            photoList.clear();
+            rvPhotos2 = (RecyclerView) findViewById(R.id.rvPhotos2);
+            galleryList = new ArrayList<>();
+            galleryAdapter = new GalleryAdapter(this, galleryList);
+            linearLayoutManager = new LinearLayoutManager(this);
+            rvPhotos2.setAdapter(galleryAdapter);
+            rvPhotos2.setLayoutManager(linearLayoutManager);
+            rvPhotos2.setItemAnimator(null);
+            rvPhotos2.getRecycledViewPool().clear();
+            galleryList.clear();
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
 
-        loadPhoto(page);
-        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout1);
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        loadGalleries(page);
+        swipeLayout2 = (SwipeRefreshLayout) findViewById(R.id.swipeLayout2);
+        swipeLayout2.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 GalleriesActivity.this.page = 1;
-                photoList.clear();
-                loadPhoto(GalleriesActivity.this.page);
+                galleryList.clear();
+                loadGalleries(GalleriesActivity.this.page);
             }
         });
 
-        rvPhotos.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                GalleriesActivity.this.page++;
-                loadPhoto(GalleriesActivity.this.page++);
-            }
-        });
+//        rvPhotos2.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+//            @Override
+//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+//                GalleriesActivity.this.page++;
+//                loadGalleries(GalleriesActivity.this.page++);
+//            }
+//        });
     }
 
-    public void loadPhoto(int page) {
-        Intent intent = getIntent();
-        String id = intent.getStringExtra("animal");
-        Log.e("A", id);
+
+    public void loadGalleries(int page) {
+        try {
             AndroidNetworking.post("https://www.flickr.com/services/rest/")
-                    .addBodyParameter("method", "flickr.galleries.getPhotos")
+                    .addBodyParameter("method", "flickr.galleries.getList")
                     .addBodyParameter("api_key", "38d6aedcff4a62c85699b67c1b352a18")
-                    .addBodyParameter("gallery_id", id)
-                    .addBodyParameter("continuation", "0")
+                    .addBodyParameter("user_id", "187032707@N07")
                     .addBodyParameter("per_page", "10")
-                    .addBodyParameter("extras", "views,media,path_alias,date_taken,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o")
                     .addBodyParameter("page", String.valueOf(page))
+                    .addBodyParameter("continuation", "0")
+                    .addBodyParameter("short_limit", "2")
                     .addBodyParameter("format", "json")
                     .addBodyParameter("nojsoncallback", "1")
                     .setTag("test")
                     .setPriority(Priority.MEDIUM)
                     .build()
-                    .getAsObject(com.example.lab5.json_gallery_photo.Example.class, new ParsedRequestListener() {
+                    .getAsObject(ExampleGalleries.class, new ParsedRequestListener() {
                         @Override
                         public void onResponse(Object response) {
-                            swipeLayout.setRefreshing(false);
-                            com.example.lab5.json_gallery_photo.Example example = (com.example.lab5.json_gallery_photo.Example) response;
-                            List<com.example.lab5.json_gallery_photo.Photo> photos = example.getPhotos().getPhoto();
-                            try {
-                                Log.e("A", photos.get(0).getTitle());
-                                photoList.addAll(photos);
-                                photoAdapter.notifyDataSetChanged();
-                                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
-                            } catch (IndexOutOfBoundsException e) {
-                                e.printStackTrace();
-                            }
-
+                            swipeLayout2.setRefreshing(false);
+                            ExampleGalleries example = (ExampleGalleries) response;
+                            List<Gallery> galleries = example.getGalleries().getGallery();
+                            galleryList.addAll(galleries);
+                            galleryAdapter.notifyDataSetChanged();
+                            galleryAdapter.notifyItemRangeRemoved(0, galleryList.size());
                         }
 
                         @Override
@@ -112,9 +105,9 @@ public class GalleriesActivity extends AppCompatActivity {
 
                         }
                     });
-
-
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
         }
 
     }
-
+}
