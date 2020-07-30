@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -55,26 +56,30 @@ public class FavoritesActivity extends AppCompatActivity {
 
         loadPhotos(page);
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout);
+
+
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 FavoritesActivity.this.page = 1;
                 photoList.clear();
-
                 loadPhotos(FavoritesActivity.this.page);
-
+                photoAdapter.notifyDataSetChanged();
+                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
             }
         });
+
 
         rvPhotos.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
                 FavoritesActivity.this.page++;
-
-                loadPhotos(FavoritesActivity.this.page);
-
+                loadPhotos(FavoritesActivity.this.page++);
             }
         });
+        
+
     }
 
     public void loadPhotos(int page) {

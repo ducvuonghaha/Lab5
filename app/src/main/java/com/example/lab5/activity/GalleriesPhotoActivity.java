@@ -44,17 +44,21 @@ public class GalleriesPhotoActivity extends AppCompatActivity {
         staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
         rvPhotos.getRecycledViewPool().clear();
         photoList.clear();
-
         loadPhoto(page);
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout1);
+
+
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 GalleriesPhotoActivity.this.page = 1;
                 photoList.clear();
                 loadPhoto(GalleriesPhotoActivity.this.page);
+                photoAdapter.notifyDataSetChanged();
+                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
             }
         });
+
 
         rvPhotos.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
             @Override
