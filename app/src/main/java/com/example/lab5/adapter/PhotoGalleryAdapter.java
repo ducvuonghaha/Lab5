@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lab5.R;
 import com.example.lab5.activity.DetailActivity;
+import com.example.lab5.activity.ImageActivity;
+import com.example.lab5.activity.ImageGalleriesActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -46,12 +48,17 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
         holder.imgList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context.getApplicationContext(), DetailActivity.class);
-                intent.putExtra("url",holder.photo.getUrlL());
+                Intent intent = new Intent(context.getApplicationContext(), ImageGalleriesActivity.class);
+                intent.putExtra("LIST",photoList);
+                intent.putExtra("POSITION",position);
                 intent.putExtra("title", holder.photo.getTitle());
                 intent.putExtra("views", holder.photo.getViews());
                 intent.putExtra("owner", holder.photo.getPathalias());
                 intent.putExtra("datetaken", holder.photo.getDatetaken());
+                intent.putExtra("UrlHigh",holder.photo.getUrlL());
+                intent.putExtra("UrlMedium",holder.photo.getUrlM());
+                intent.putExtra("UrlLow",holder.photo.getUrlQ());
+
                 context.startActivity(intent);
 
             }

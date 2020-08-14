@@ -1,17 +1,18 @@
 package com.example.lab5.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -22,8 +23,6 @@ import com.example.lab5.R;
 import com.example.lab5.adapter.PhotoAdapter;
 import com.example.lab5.json_favorites.Example;
 import com.example.lab5.json_favorites.Photo;
-import com.example.lab5.json_galleries.ExampleGalleries;
-import com.example.lab5.json_galleries.Gallery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +36,7 @@ public class FavoritesActivity extends AppCompatActivity {
     private ArrayList<com.example.lab5.json_favorites.Photo> photoList;
     private StaggeredGridLayoutManager staggeredGridLayoutManager;
 
+    boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,7 @@ public class FavoritesActivity extends AppCompatActivity {
                 photoList.clear();
                 loadPhotos(FavoritesActivity.this.page);
                 photoAdapter.notifyDataSetChanged();
+                photoAdapter.notifyItemRangeInserted(0, photoList.size());
                 photoAdapter.notifyItemRangeRemoved(0, photoList.size());
             }
         });
@@ -76,10 +77,23 @@ public class FavoritesActivity extends AppCompatActivity {
 
                 FavoritesActivity.this.page++;
                 loadPhotos(FavoritesActivity.this.page++);
+                photoAdapter.notifyDataSetChanged();
+                photoAdapter.notifyItemRangeInserted(0, photoList.size());
+                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
             }
+
         });
         
 
+    }
+
+    static class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
+
+        public LoadingViewHolder(View itemView) {
+            super(itemView);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+        }
     }
 
     public void loadPhotos(int page) {
@@ -106,6 +120,7 @@ public class FavoritesActivity extends AppCompatActivity {
                         try {
                             photoList.addAll(photos);
                             photoAdapter.notifyDataSetChanged();
+                            photoAdapter.notifyItemRangeInserted(0, photoList.size());
                             photoAdapter.notifyItemRangeRemoved(0, photoList.size());
                         } catch (IndexOutOfBoundsException e) {
                             e.printStackTrace();
@@ -123,5 +138,28 @@ public class FavoritesActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_main_menu, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.favorites:
+                Intent intent = new Intent(FavoritesActivity.this, FavoritesActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.galleries:
+                Intent intent1 = new Intent(FavoritesActivity.this, GalleriesActivity.class);
+                startActivity(intent1);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 }

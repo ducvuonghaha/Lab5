@@ -30,12 +30,12 @@ public class DetailActivity extends AppCompatActivity {
         imvPhoto = (ImageView) findViewById(R.id.imvPhoto);
         tvDate = (TextView) findViewById(R.id.tvDate);
 
-        Intent intent = getIntent();
+        Intent intent1 = getIntent();
         String ownerr = "Tác giả: ";
         String views = "Lượt xem: ";
         String datee = "Ngày tải lên: ";
 
-        String title = intent.getStringExtra("title");
+        String title = intent1.getStringExtra("title");
         if (title == null) {
             tvTitle.setText("Khong co tieu de");
         } else {
@@ -43,14 +43,14 @@ public class DetailActivity extends AppCompatActivity {
         }
 
 
-        String owner = intent.getStringExtra("owner");
+        String owner = intent1.getStringExtra("owner");
         if (owner == null) {
             tvOwner.setText("Khong co tac gia");
         } else {
             tvOwner.setText(ownerr += owner);
         }
 
-        String viewss = intent.getStringExtra("views");
+        String viewss = intent1.getStringExtra("views");
 
         if (views == null) {
             tvViews.setText("Khong co luot xem");
@@ -58,7 +58,7 @@ public class DetailActivity extends AppCompatActivity {
             tvViews.setText(views += viewss);
         }
 
-        String dateupload = intent.getStringExtra("datetaken");
+        String dateupload = intent1.getStringExtra("datetaken");
         if (dateupload == null) {
             tvDate.setText("Khong tai duoc ngay");
         } else {
@@ -66,7 +66,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
 
-        String url = intent.getStringExtra("url");
+        String url = intent1.getStringExtra("url");
         Picasso.get().load(url).into(imvPhoto);
     }
 }

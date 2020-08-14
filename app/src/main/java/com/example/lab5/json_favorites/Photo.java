@@ -4,7 +4,9 @@ package com.example.lab5.json_favorites;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Photo {
+import java.io.Serializable;
+
+public class Photo implements Serializable {
 
     @SerializedName("id")
     @Expose

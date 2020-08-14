@@ -7,16 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".activity.FavoritesActivity">
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPhotos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-<!--    <ProgressBar-->
-<!--        android:layout_marginTop="40dp"-->
-<!--        android:id="@+id/progressBar"-->
-<!--        style="?android:attr/progressBarStyleHorizontal"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content" />-->
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
