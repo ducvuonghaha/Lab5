@@ -1,9 +1,14 @@
 package com.example.lab5.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +28,8 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_detail);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvOwner = (TextView) findViewById(R.id.tvOwner);
@@ -34,6 +41,7 @@ public class DetailActivity extends AppCompatActivity {
         String ownerr = "Tác giả: ";
         String views = "Lượt xem: ";
         String datee = "Ngày tải lên: ";
+
 
         String title = intent1.getStringExtra("title");
         if (title == null) {
@@ -66,7 +74,34 @@ public class DetailActivity extends AppCompatActivity {
         }
 
 
-        String url = intent1.getStringExtra("url");
+        Bundle bundle = getIntent().getExtras();
+
+        String url = bundle.getString("url");
         Picasso.get().load(url).into(imvPhoto);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.favorites:
+                Intent intent = new Intent(DetailActivity.this, FavoritesActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.galleries:
+                Intent intent1 = new Intent(DetailActivity.this, GalleriesActivity.class);
+                startActivity(intent1);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 }

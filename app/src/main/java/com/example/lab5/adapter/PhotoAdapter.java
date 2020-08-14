@@ -1,10 +1,14 @@
 package com.example.lab5.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -13,27 +17,35 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lab5.OnLoadMoreListener;
 import com.example.lab5.activity.DetailActivity;
 import com.example.lab5.R;
 import com.example.lab5.activity.ImageActivity;
+import com.example.lab5.json_favorites.Photo;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder> {
 
     private Context context;
     private ArrayList<com.example.lab5.json_favorites.Photo> photoList;
-
+    private ArrayList<Photo> photoListFull;
 
     public PhotoAdapter(Context context, ArrayList<com.example.lab5.json_favorites.Photo> photoList) {
         this.context = context;
         this.photoList = photoList;
+        photoListFull = new ArrayList<>();
     }
+
+
 
 
 //    public void setOnLoadMoreListener(OnLoadMoreListener mOnLoadMoreListener) {
@@ -66,6 +78,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
 //                    intent.putExtra("owner", photoHolder.photo.getPathalias());
 //                    intent.putExtra("datetaken", photoHolder.photo.getDatetaken());
 //                    context.startActivity(intent);
+                    Bundle bundle = new Bundle();
                     Intent intent = new Intent(context.getApplicationContext(), ImageActivity.class);
                     intent.putExtra("LIST",photoList);
                     intent.putExtra("POSITION",position);
@@ -76,8 +89,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
                     intent.putExtra("UrlHigh",photoHolder.photo.getUrlO());
                     intent.putExtra("UrlMedium",photoHolder.photo.getUrlL());
                     intent.putExtra("UrlLow",photoHolder.photo.getUrlM());
-
-                    context.startActivity(intent);
+                    bundle.putString("UrlMedium", photoHolder.photo.getUrlL());
+                    intent.putExtras(bundle);
+                    ActivityOptionsCompat activityOptionsCompat= ActivityOptionsCompat
+                            .makeSceneTransitionAnimation((Activity) context, photoHolder.imgList, ViewCompat.getTransitionName(photoHolder.imgList));
+                    context.startActivity(intent, activityOptionsCompat.toBundle());
                 }
             });
 
@@ -98,6 +114,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
     public int getItemCount() {
         return photoList.size();
     }
+
 
 
     public class PhotoHolder extends RecyclerView.ViewHolder {

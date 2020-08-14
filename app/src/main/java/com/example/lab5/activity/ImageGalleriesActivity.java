@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
@@ -14,31 +15,44 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
 import com.example.lab5.R;
-import com.example.lab5.adapter.FullSizeAdapter;
-import com.example.lab5.adapter.FullSizeGalleryAdapter;
+//import com.example.lab5.adapter.FullSizeGalleryAdapter;
 import com.example.lab5.json_gallery_photo.Photo;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.squareup.picasso.Picasso;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 public class ImageGalleriesActivity extends AppCompatActivity {
     int position;
-    private ViewPager viewPagerGallery;
+//    private ViewPager viewPagerGallery;
     private FloatingActionButton fabAction4Gallery;
     private FloatingActionButton fabAction1Gallery;
     private FloatingActionButton fabAction2Gallery;
     private FloatingActionButton fabAction3Gallery;
-    private FullSizeGalleryAdapter fullSizeAdapter;
+    private ImageView imgFullSize2;
+
+
+
+    //    private FullSizeGalleryAdapter fullSizeAdapter;
     private static final int PERMISSION_REQUEST_CODE = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_image_galleries);
 
         initView();
@@ -49,49 +63,81 @@ public class ImageGalleriesActivity extends AppCompatActivity {
 
         final ArrayList<Photo> list = (ArrayList<Photo>) intent.getSerializableExtra("LIST");
         position = intent.getIntExtra("POSITION", 0);
-        fullSizeAdapter = new FullSizeGalleryAdapter(this, list);
-        viewPagerGallery.setAdapter(fullSizeAdapter);
-        viewPagerGallery.setCurrentItem(position, true);
+//        fullSizeAdapter = new FullSizeGalleryAdapter(this, list);
+//        viewPagerGallery.setAdapter(fullSizeAdapter);
+//        viewPagerGallery.setCurrentItem(position, true);
+
+        String urlO = intent.getStringExtra("UrlHigh");
+        String urlL = intent.getStringExtra("UrlMedium");
+        String urlM = intent.getStringExtra("UrlLow");
+
+        Bundle bundle = getIntent().getExtras();
+
+        String url = bundle.getString("UrlMedium");
+
+        Picasso.get().load(url).into(imgFullSize2);
 
         fabAction1Gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Photo photo = list.get(viewPagerGallery.getCurrentItem());
-                if (photo.getUrlC() != null) {
-                    startDownload(photo.getUrlC());
+
+                if (urlO == null) {
+                    Toast.makeText(ImageGalleriesActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
                 } else {
-                    startDownload(photo.getUrlL());
+                    startDownload(urlO);
                 }
             }
         });
         fabAction2Gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Photo photo = list.get(viewPagerGallery.getCurrentItem());
-                startDownload(photo.getUrlL());
+                if (urlL == null) {
+                    Toast.makeText(ImageGalleriesActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
+                } else {
+                    startDownload(urlL);
+                }
             }
 
         });
         fabAction3Gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Photo photo = list.get(viewPagerGallery.getCurrentItem());
-                startDownload(photo.getUrlM());
-
+                if (urlM == null) {
+                    Toast.makeText(ImageGalleriesActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
+                } else {
+                    startDownload(urlM);
+                }
             }
         });
+        String title = intent.getStringExtra("title");
+        String views = intent.getStringExtra("views");
+        String owner = intent.getStringExtra("owner");
+        String datetaken = intent.getStringExtra("datetaken");
+
         fabAction4Gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Photo photo = list.get(viewPagerGallery.getCurrentItem());
+                Bundle bundle = new Bundle();
                 Intent intent1 = new Intent(ImageGalleriesActivity.this, DetailActivity.class);
-                intent1.putExtra("title", photo.getTitle());
-                intent1.putExtra("owner", photo.getPathalias());
-                intent1.putExtra("datetaken", photo.getDatetaken());
-                intent1.putExtra("url", photo.getUrlL());
-                intent1.putExtra("views", photo.getViews());
-                Log.e("title", photo.getTitle());
-                startActivity(intent1);
+                intent1.putExtra("title", title);
+                intent1.putExtra("owner", owner);
+                intent1.putExtra("datetaken", datetaken);
+                intent1.putExtra("url", url);
+                intent1.putExtra("views", views);
+                Log.e("title", title);
+                bundle.putString("url", urlL);
+                intent1.putExtras(bundle);
+                try {
+                    Pair[] pair = new Pair[1];
+                    pair[0] = new Pair<View, String>(imgFullSize2, "imageTransition");
+                    ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation
+                            (ImageGalleriesActivity.this, pair);
+                    startActivity(intent1, activityOptions.toBundle());
+                } catch (NullPointerException e) {
+                    Toast.makeText(ImageGalleriesActivity.this, "Lỗi: " + e, Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+
             }
         });
     }
@@ -157,13 +203,37 @@ public class ImageGalleriesActivity extends AppCompatActivity {
     }
 
     private void initView() {
-
-
-        viewPagerGallery = (ViewPager) findViewById(R.id.viewPager_gallery);
+//        viewPagerGallery = (ViewPager) findViewById(R.id.viewPager_gallery);
         fabAction4Gallery = (FloatingActionButton) findViewById(R.id.fab_action4_gallery);
         fabAction1Gallery = (FloatingActionButton) findViewById(R.id.fab_action1_gallery);
         fabAction2Gallery = (FloatingActionButton) findViewById(R.id.fab_action2_gallery);
         fabAction3Gallery = (FloatingActionButton) findViewById(R.id.fab_action3_gallery);
+
+        imgFullSize2 = (ImageView) findViewById(R.id.imgFullSize2);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.favorites:
+                Intent intent = new Intent(ImageGalleriesActivity.this, FavoritesActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.galleries:
+                Intent intent1 = new Intent(ImageGalleriesActivity.this, GalleriesActivity.class);
+                startActivity(intent1);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
     }
 }

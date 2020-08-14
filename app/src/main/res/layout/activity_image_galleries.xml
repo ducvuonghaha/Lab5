@@ -6,10 +6,16 @@
     android:layout_height="match_parent"
     app:ignore="NamespaceTypo">
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewPager_gallery"
+<!--    <androidx.viewpager.widget.ViewPager-->
+<!--        android:id="@+id/viewPager_gallery"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" />-->
+
+    <ImageView
+        android:id="@+id/imgFullSize2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:transitionName="imageTransition" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:layout_width="wrap_content"

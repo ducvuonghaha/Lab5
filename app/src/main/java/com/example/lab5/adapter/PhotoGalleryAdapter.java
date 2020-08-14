@@ -1,7 +1,9 @@
 package com.example.lab5.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lab5.R;
@@ -48,6 +52,7 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
         holder.imgList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle bundle = new Bundle();
                 Intent intent = new Intent(context.getApplicationContext(), ImageGalleriesActivity.class);
                 intent.putExtra("LIST",photoList);
                 intent.putExtra("POSITION",position);
@@ -58,8 +63,11 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
                 intent.putExtra("UrlHigh",holder.photo.getUrlL());
                 intent.putExtra("UrlMedium",holder.photo.getUrlM());
                 intent.putExtra("UrlLow",holder.photo.getUrlQ());
-
-                context.startActivity(intent);
+                bundle.putString("UrlMedium", holder.photo.getUrlL());
+                intent.putExtras(bundle);
+                ActivityOptionsCompat activityOptionsCompat= ActivityOptionsCompat
+                        .makeSceneTransitionAnimation((Activity) context, holder.imgList, ViewCompat.getTransitionName(holder.imgList));
+                context.startActivity(intent, activityOptionsCompat.toBundle());
 
             }
         });
