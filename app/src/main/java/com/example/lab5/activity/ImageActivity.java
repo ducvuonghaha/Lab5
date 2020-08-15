@@ -3,17 +3,22 @@ package com.example.lab5.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.ActivityOptions;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -25,17 +30,31 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.ParsedRequestListener;
+import com.example.lab5.BaseActivity;
 import com.example.lab5.R;
+import com.example.lab5.adapter.CommentAdapter;
 import com.example.lab5.adapter.PhotoAdapter;
+import com.example.lab5.json_comment.Comment;
+import com.example.lab5.json_favorites.Example;
 import com.example.lab5.json_favorites.Photo;
 import com.example.lab5.loader.SetBGLoader;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 
-public class ImageActivity extends AppCompatActivity {
+public class ImageActivity extends BaseActivity {
     int position;
     //    private ViewPager viewPager;
     private FloatingActionButton fabAction1;
@@ -43,6 +62,7 @@ public class ImageActivity extends AppCompatActivity {
     private FloatingActionButton fabAction3;
     private FloatingActionButton fabAction4;
     private FloatingActionButton fabAction5;
+    private FloatingActionButton fabAction6;
 
 
 
@@ -57,7 +77,7 @@ public class ImageActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_image);
         initView();
-        imgFullSize = findViewById(R.id.imgFullSize1);
+
         AndroidNetworking.initialize(getApplicationContext());
 
         Intent intent = getIntent();
@@ -68,6 +88,9 @@ public class ImageActivity extends AppCompatActivity {
         String urlO = intent.getStringExtra("UrlHigh");
         String urlL = intent.getStringExtra("UrlMedium");
         String urlM = intent.getStringExtra("UrlLow");
+
+        String id = intent.getStringExtra("idPhoto");
+
 
         Bundle bundle = getIntent().getExtras();
 
@@ -85,9 +108,10 @@ public class ImageActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Photo photo = list.get(viewPager.getCurrentItem());
                 if (urlO == null) {
-                    Toast.makeText(ImageActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
+                    Toasty.warning(ImageActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
                 } else {
                     startDownload(urlO);
+                    showMessegeSuccess("Tải ảnh high thành công");
                 }
             }
         });
@@ -96,9 +120,10 @@ public class ImageActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Photo photo = list.get(viewPager.getCurrentItem());
                 if (urlL == null) {
-                    Toast.makeText(ImageActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
+                    Toasty.warning(ImageActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
                 } else {
                     startDownload(urlL);
+                    showMessegeSuccess("Tải ảnh medium thành công");
                 }
             }
 
@@ -108,9 +133,10 @@ public class ImageActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Photo photo = list.get(viewPager.getCurrentItem());
                 if (urlM == null) {
-                    Toast.makeText(ImageActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
+                    Toasty.warning(ImageActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
                 } else {
                     startDownload(urlM);
+                    showMessegeSuccess("Tải ảnh low thành công");
                 }
             }
         });
@@ -131,6 +157,7 @@ public class ImageActivity extends AppCompatActivity {
                 intent1.putExtra("datetaken", datetaken);
                 intent1.putExtra("url", urlL);
                 intent1.putExtra("views", views);
+                intent1.putExtra("idPhoto", id);
                 Log.e("title", title);
 
                 bundle.putString("url", urlL);
@@ -161,6 +188,42 @@ public class ImageActivity extends AppCompatActivity {
                 }
                 SetBGLoader setBGLoader=new SetBGLoader(ImageActivity.this);
                 setBGLoader.execute(url);
+            }
+        });
+
+        try {
+
+            PackageInfo info = getPackageManager().getPackageInfo(
+
+                    "com.example.facebook",
+
+                    PackageManager.GET_SIGNATURES);
+
+            for (Signature signature : info.signatures) {
+
+                MessageDigest md = MessageDigest.getInstance("SHA");
+
+                md.update(signature.toByteArray());
+
+                Log.e("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+
+            }
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        fabAction6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ShareLinkContent content = new ShareLinkContent.Builder()
+                        .setContentUrl(Uri.parse(url))
+                        .build();
+                ShareDialog.show(ImageActivity.this, content);
             }
         });
     }
@@ -226,12 +289,13 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     private void initView() {
-//        viewPager = (ViewPager) findViewById(R.id.viewPager);
         fabAction1 = (FloatingActionButton) findViewById(R.id.fab_action1);
         fabAction2 = (FloatingActionButton) findViewById(R.id.fab_action2);
         fabAction3 = (FloatingActionButton) findViewById(R.id.fab_action3);
         fabAction4 = (FloatingActionButton) findViewById(R.id.fab_action4);
         fabAction5 = (FloatingActionButton) findViewById(R.id.fab_action5);
+        fabAction6 = (FloatingActionButton) findViewById(R.id.fab_action6);
+        imgFullSize = findViewById(R.id.imgFullSize1);
     }
 
     @Override
@@ -258,4 +322,7 @@ public class ImageActivity extends AppCompatActivity {
         }
 
     }
+
+
+
 }

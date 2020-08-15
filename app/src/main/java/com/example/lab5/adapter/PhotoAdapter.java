@@ -82,6 +82,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
                     Intent intent = new Intent(context.getApplicationContext(), ImageActivity.class);
                     intent.putExtra("LIST",photoList);
                     intent.putExtra("POSITION",position);
+                    intent.putExtra("idPhoto", photoHolder.photo.getId());
                     intent.putExtra("title", photoHolder.photo.getTitle());
                     intent.putExtra("views", photoHolder.photo.getViews());
                     intent.putExtra("owner", photoHolder.photo.getPathalias());

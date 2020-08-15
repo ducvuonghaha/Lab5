@@ -1,5 +1,7 @@
 package com.example.lab5.loader;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,20 +11,34 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.example.lab5.R;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
+
 public class SetBGLoader extends AsyncTask<String,String,String> {
     WallpaperManager wallpaperManager;
     Context context;
-    WindowManager windowManager;
-    Bitmap bitmap1,bitmap2;
-    DisplayMetrics displayMetrics;
-    int height,width;
+    private AlertDialog progressDialog;
+    Bitmap bitmap1;
     public SetBGLoader(Context context) {
         this.context = context;
     }
+
+    @Override
+    protected void onPreExecute() {
+
+        super.onPreExecute();
+        progressDialog = new SpotsDialog(context, R.style.Custom);
+        progressDialog = new SpotsDialog(context, "Đang cài hình nền");
+        progressDialog.show();
+
+    }
+
     @Override
     protected String doInBackground(String... strings) {
         wallpaperManager  = WallpaperManager.getInstance(context.getApplicationContext());
@@ -46,6 +62,9 @@ public class SetBGLoader extends AsyncTask<String,String,String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        Toast.makeText(context, "Thay hinh nen thanh cong", Toast.LENGTH_SHORT).show();
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
+            Toasty.success(context, "Thay hình nền thành công", Toast.LENGTH_SHORT).show();
+
     }
 }

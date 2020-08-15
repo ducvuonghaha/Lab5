@@ -38,11 +38,12 @@ public class FavoritesActivity extends AppCompatActivity {
     private int page = 1;
     private int pageSearch = 1;
     private PhotoAdapter photoAdapter;
-//    private PhotoSearchAdapter photoSearchAdapter;
+    //    private PhotoSearchAdapter photoSearchAdapter;
     private ArrayList<com.example.lab5.json_favorites.Photo> photoList;
     private StaggeredGridLayoutManager staggeredGridLayoutManager;
-//    private ArrayList<com.example.lab5.json_search.Photo> photoSearchList;
+    //    private ArrayList<com.example.lab5.json_search.Photo> photoSearchList;
     boolean isLoading = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +73,9 @@ public class FavoritesActivity extends AppCompatActivity {
                 loadPhotos(FavoritesActivity.this.page);
                 photoAdapter.notifyDataSetChanged();
                 photoAdapter.notifyItemRangeInserted(0, photoList.size());
-                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
+
             }
+
         });
 
 
@@ -83,14 +85,23 @@ public class FavoritesActivity extends AppCompatActivity {
 
                 FavoritesActivity.this.page++;
                 loadPhotos(FavoritesActivity.this.page);
-                photoAdapter.notifyDataSetChanged();
-                photoAdapter.notifyItemRangeInserted(0, photoList.size());
-                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
+//                photoAdapter.notifyDataSetChanged();
+//                photoAdapter.notifyItemRangeInserted(0, photoList.size());
+
             }
 
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                super.onScrolled(rvPhotos, dx, dy);
+                if (dy > 0) {
+                    getSupportActionBar().hide();
+//                    Log.e("RecyclerView scrolled: ", "scroll up!");
+                } else {
+                    getSupportActionBar().show();
+//                    Log.e("RecyclerView scrolled: ", "scroll down!");
+                }
+            }
         });
-
-
     }
 
     static class LoadingViewHolder extends RecyclerView.ViewHolder {
@@ -127,7 +138,7 @@ public class FavoritesActivity extends AppCompatActivity {
                             photoList.addAll(photos);
                             photoAdapter.notifyDataSetChanged();
                             photoAdapter.notifyItemRangeInserted(0, photoList.size());
-                            photoAdapter.notifyItemRangeRemoved(0, photoList.size());
+
                         } catch (IndexOutOfBoundsException e) {
                             e.printStackTrace();
                         }
@@ -156,21 +167,37 @@ public class FavoritesActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                photoList = new ArrayList<>();
-                photoAdapter = new PhotoAdapter(FavoritesActivity.this, photoList);
-                staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-                rvPhotos.setLayoutManager(staggeredGridLayoutManager);
-                rvPhotos.setAdapter(photoAdapter);
-                rvPhotos.setItemAnimator(null);
-                staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-                rvPhotos.getRecycledViewPool().clear();
-                photoList.clear();
+
                 String text = newText.toLowerCase().trim();
                 if (text.length() == 0) {
                     Toast.makeText(FavoritesActivity.this, "Chưa nhập tên ảnh !", Toast.LENGTH_SHORT).show();
                 } else {
 //                    Toast.makeText(FavoritesActivity.this, text, Toast.LENGTH_SHORT).show();
+                    photoList = new ArrayList<>();
+                    photoAdapter = new PhotoAdapter(FavoritesActivity.this, photoList);
+                    staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+                    rvPhotos.setLayoutManager(staggeredGridLayoutManager);
+                    rvPhotos.setAdapter(photoAdapter);
+                    rvPhotos.setItemAnimator(null);
+                    staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+                    rvPhotos.getRecycledViewPool().clear();
+
+
+                    photoList.clear();
+                    pageSearch++;
                     searchImage(pageSearch, text);
+
+                    rvPhotos.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
+                        @Override
+                        public void onLoadMore(int  page, int totalItemsCount, RecyclerView view) {
+
+                            pageSearch++;
+                            searchImage(pageSearch++, text);
+                            photoAdapter.notifyDataSetChanged();
+                            photoAdapter.notifyItemRangeInserted(0, photoList.size());
+
+                        }
+                    });
                 }
                 return true;
             }
@@ -190,7 +217,7 @@ public class FavoritesActivity extends AppCompatActivity {
                     .addBodyParameter("format", "json")
                     .addBodyParameter("nojsoncallback", "1")
                     .addBodyParameter("extras", "views,media,path_alias,date_taken,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o")
-                    .addBodyParameter("per_page", "30")
+                    .addBodyParameter("per_page", "10")
                     .addBodyParameter("page", String.valueOf(page))
                     .setTag("test")
                     .setPriority(Priority.MEDIUM)
@@ -210,7 +237,6 @@ public class FavoritesActivity extends AppCompatActivity {
                                 Log.e("BBB", photoList.get(0).getTitle());
                                 photoAdapter.notifyDataSetChanged();
                                 photoAdapter.notifyItemRangeInserted(0, photoList.size());
-                                photoAdapter.notifyItemRangeRemoved(0, photoList.size());
 
                             } catch (IndexOutOfBoundsException e) {
                                 e.printStackTrace();

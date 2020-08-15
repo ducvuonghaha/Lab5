@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
     android:background="#BBD5D8"
-    android:orientation="vertical"
     tools:context=".activity.DetailActivity">
 
+    <LinearLayout
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <TextView
-        android:textStyle="bold"
-        android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Thông tin ảnh"
-        android:textSize="30dp" />
+        android:textSize="30dp"
+        android:textStyle="bold" />
 
 
     <ImageView
-        android:transitionName="imageTransition"
         android:id="@+id/imvPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,54 +30,98 @@
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_background"
+        android:transitionName="imageTransition"
         app:layout_constraintDimensionRatio="1:1" />
 
     <TextView
-        android:gravity="center_horizontal"
-        android:textStyle="bold"
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
         android:text="Title"
         android:textColor="#EF0F0F"
-        android:textSize="18dp" />
+        android:textSize="18dp"
+        android:textStyle="bold" />
 
     <TextView
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="60dp"
         android:id="@+id/tvViews"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="5dp"
         android:text="Views"
         android:textSize="12dp"
         android:textStyle="italic" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tvOwner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:orientation="horizontal">
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="70dp"
+        android:text="Owner" />
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginBottom="5dp"
+        android:text="Date"
+        android:textSize="14dp" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="5dp"
+        android:background="#B9BABA"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
         <TextView
-            android:layout_marginLeft="10dp"
-            android:id="@+id/tvOwner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="70dp"
-            android:text="Owner" />
+            android:layout_marginTop="8dp"
+            android:text="Comments"
+            android:textSize="20dp"
+            android:textStyle="bold" />
 
-
-
-        <TextView
-            android:id="@+id/tvDate"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvComment"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Date"
-            android:textSize="14dp" />
+            android:layout_margin="10dp" />
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <EditText
+            android:id="@+id/edtComment"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:hint="Bình luận ...." />
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/imvSend"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/send" />
+
+    </LinearLayout>
+    </LinearLayout>
+</ScrollView>

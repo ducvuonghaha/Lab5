@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
+import com.example.lab5.BaseActivity;
 import com.example.lab5.R;
 //import com.example.lab5.adapter.FullSizeGalleryAdapter;
 import com.example.lab5.json_gallery_photo.Photo;
@@ -34,7 +35,7 @@ import com.squareup.picasso.Picasso;
 import java.security.PublicKey;
 import java.util.ArrayList;
 
-public class ImageGalleriesActivity extends AppCompatActivity {
+public class ImageGalleriesActivity extends BaseActivity {
     int position;
 //    private ViewPager viewPagerGallery;
     private FloatingActionButton fabAction4Gallery;
@@ -85,6 +86,7 @@ public class ImageGalleriesActivity extends AppCompatActivity {
                     Toast.makeText(ImageGalleriesActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
                 } else {
                     startDownload(urlO);
+                    showMessegeSuccess("Tải ảnh high thành công");
                 }
             }
         });
@@ -95,6 +97,7 @@ public class ImageGalleriesActivity extends AppCompatActivity {
                     Toast.makeText(ImageGalleriesActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
                 } else {
                     startDownload(urlL);
+                    showMessegeSuccess("Tải ảnh medium thành công");
                 }
             }
 
@@ -106,6 +109,7 @@ public class ImageGalleriesActivity extends AppCompatActivity {
                     Toast.makeText(ImageGalleriesActivity.this, "Ảnh không có kích thước này", Toast.LENGTH_SHORT).show();
                 } else {
                     startDownload(urlM);
+                    showMessegeSuccess("Tải ảnh low thành công");
                 }
             }
         });
